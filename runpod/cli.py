@@ -75,11 +75,11 @@ class Cli(object):
 
     def call(self, args=None):
         self._process_args(args)
-        if self.opts.target_cmd and self.opts.target_cmd in self.cmds:
-            self.cmds[self.opts.target_cmd][1](self.opts)
+        self.cmds[self.opts.target_cmd][1](self.opts)
 
     def _process_args(self, args=None):
         self.opts = self.parser.parse_args(args)
+
         if self.opts.project_directory is None:
             if os.path.isfile(self.opts.file.name):
                 self.opts.project_directory = os.path.dirname(os.path.abspath(self.opts.file.name))
@@ -89,3 +89,8 @@ class Cli(object):
             self.opts.project_name = os.path.basename(self.opts.project_directory)
         elif not self.opts.project_name:
             self.parser.error("project name is required")
+
+        if not self.opts.target_cmd:
+            self.parser.error("subcommand is required")
+        elif self.opts.target_cmd not in self.cmds:
+            self.parser.error("'{}' is not a valid subcommand".format(self.opts.target_cmd))
