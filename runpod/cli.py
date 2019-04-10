@@ -6,11 +6,13 @@ import pkgutil
 import six
 import sys
 
+import runpod.parsers
+
 class Cli(object):
     def __init__(self):
         self.cmds = {}
 
-        self.parser = argparse.ArgumentParser()
+        self.parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
         self._init_parser()
         self.subparsers = self.parser.add_subparsers(dest='target_cmd', description="Choose an action to perform")
 
@@ -27,6 +29,7 @@ class Cli(object):
         self.parser.add_argument("-f", "--file", type=argparse.FileType(), default="runpod.yaml", help="Specify the pod source file")
         self.parser.add_argument("-p", "--project-name", metavar="NAME", help="Specify the project name")
         self.parser.add_argument("--project-directory", type=dir_validator, metavar="PATH", help="Specify the working directory for the project")
+        self.parser.add_argument("-F", "--source-format", choices=set(modname for _, modname, _ in pkgutil.iter_modules(runpod.parsers.__path__)), default="runpod", metavar="FMT", help="Set the pod source file format to %(metavar)s\n\t(formats: %(choices)s)")
 
     def _load_cmds(self):
         cmdpkg = importlib.import_module('..cmd', __name__)
@@ -75,7 +78,13 @@ class Cli(object):
 
     def call(self, args=None):
         self._process_args(args)
-        self.cmds[self.opts.target_cmd][1](self.opts)
+
+        pod_parser = importlib.import_module('runpod.parsers.{}'.format(self.opts.source_format))
+        try:
+            podspec = pod_parser.parse_file(self.opts.file)
+        except runpod.parsers.ParseError as e:
+            sys.exit("Error parsing pod source file: " + str(e))
+        self.cmds[self.opts.target_cmd][1](podspec, self.opts)
 
     def _process_args(self, args=None):
         self.opts = self.parser.parse_args(args)

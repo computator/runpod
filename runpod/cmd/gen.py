@@ -5,7 +5,7 @@ def get_cmd_names():
 
 def init_cmd_subparsers(add_parser):
     parser = add_parser("gen")
-    parser.add_argument("gen_format", choices=("systemd",))
+    parser.add_argument('gen_format', choices=("systemd",))
 
-def cmd_gen(opts):
-    print(opts)
+def cmd_gen(podspec, opts):
+    print(podspec, opts)
