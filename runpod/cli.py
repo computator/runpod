@@ -14,7 +14,7 @@ class Cli(object):
 
         self.parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
         self._init_parser()
-        self.subparsers = self.parser.add_subparsers(dest='target_cmd', description="Choose an action to perform")
+        self.subparsers = self.parser.add_subparsers(dest='target_cmd', description="choose an action to perform")
 
         self._load_cmds()
 
@@ -26,10 +26,10 @@ class Cli(object):
                     return out_dir
             raise argparse.ArgumentTypeError("'{}' is not a valid directory".format(directory))
 
-        self.parser.add_argument("-f", "--file", type=argparse.FileType(), default="runpod.yaml", help="Specify the pod source file")
-        self.parser.add_argument("-p", "--project-name", metavar="NAME", help="Specify the project name")
-        self.parser.add_argument("--project-directory", type=dir_validator, metavar="PATH", help="Specify the working directory for the project")
-        self.parser.add_argument("-F", "--source-format", choices=set(modname for _, modname, _ in pkgutil.iter_modules(runpod.parsers.__path__)), default="runpod", metavar="FMT", help="Set the pod source file format to %(metavar)s\n\t(formats: %(choices)s)")
+        self.parser.add_argument("-F", "--source-format", choices=set(modname for _, modname, _ in pkgutil.iter_modules(runpod.parsers.__path__)), default="runpod", metavar="FMT", help="set the pod source format to %(metavar)s\n\t(default: %(default)s, formats: %(choices)s)")
+        self.parser.add_argument("-f", "--file", type=argparse.FileType(), default="runpod.yaml", help="specify the pod source file")
+        self.parser.add_argument("-p", "--project-name", metavar="NAME", help="set the unique name used for the project\n\t(default: the name of the project working directory)")
+        self.parser.add_argument("--project-directory", type=dir_validator, metavar="PATH", help="set the working directory for the project\n\t(default: the directory containing the pod source file)")
 
     def _load_cmds(self):
         cmdpkg = importlib.import_module('..cmd', __name__)
