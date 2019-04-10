@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import argparse
 import importlib
+import os.path
 import pkgutil
 import six
 import sys
@@ -8,10 +9,24 @@ import sys
 class Cli(object):
     def __init__(self):
         self.cmds = {}
+
         self.parser = argparse.ArgumentParser()
+        self._init_parser()
         self.subparsers = self.parser.add_subparsers(dest='target_cmd', description="Choose an action to perform")
 
         self._load_cmds()
+
+    def _init_parser(self):
+        def dir_validator(directory):
+            if directory:
+                out_dir = os.path.abspath(directory)
+                if os.path.isdir(out_dir):
+                    return out_dir
+            raise argparse.ArgumentTypeError("'{}' is not a valid directory".format(directory))
+
+        self.parser.add_argument("-f", "--file", type=argparse.FileType(), default="runpod.yaml", help="Specify the pod source file")
+        self.parser.add_argument("-p", "--project-name", metavar="NAME", help="Specify the project name")
+        self.parser.add_argument("--project-directory", type=dir_validator, metavar="PATH", help="Specify the working directory for the project")
 
     def _load_cmds(self):
         cmdpkg = importlib.import_module('..cmd', __name__)
@@ -59,7 +74,18 @@ class Cli(object):
         self.cmds.update((cmdname, (mod, getattr(mod, 'cmd_' + cmdname))) for cmdname in mod_cmdnames)
 
     def call(self, args=None):
-        opts = self.parser.parse_args(args)
-        print(opts)
-        if opts.target_cmd and opts.target_cmd in self.cmds:
-            self.cmds[opts.target_cmd][1](opts)
+        self._process_args(args)
+        if self.opts.target_cmd and self.opts.target_cmd in self.cmds:
+            self.cmds[self.opts.target_cmd][1](self.opts)
+
+    def _process_args(self, args=None):
+        self.opts = self.parser.parse_args(args)
+        if self.opts.project_directory is None:
+            if os.path.isfile(self.opts.file.name):
+                self.opts.project_directory = os.path.dirname(os.path.abspath(self.opts.file.name))
+            else:
+                self.opts.project_directory = os.getcwd()
+        if self.opts.project_name is None:
+            self.opts.project_name = os.path.basename(self.opts.project_directory)
+        elif not self.opts.project_name:
+            self.parser.error("project name is required")
