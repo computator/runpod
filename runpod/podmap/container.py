@@ -19,7 +19,36 @@ class Container(object):
             else:
                 raise RuntimeError("Image ID '{0.id}' for image {0} does not match expected format".format(image))
 
-        self.exposed_ports = set();
+        self.annotations = {}
+        self.extra_hosts = {}
+        self.capabilities_add = set()
+        self.capabilities_drop = set()
+        self.devices = []
+        self.dns_enabled = True
+        self.dns_options = {}
+        self.dns_search = []
+        self.dns_servers = []
+        self.entrypoint = None
+        self.env = {}
+        self.env_file = None
+        self.exposed_ports = set()
+        self.hostname = None
+        self.ip = None
+        self.labels = {}
+        self.label_file = None
+        self.mounts = []
+        self.network = None
+        self.no_hosts = False
+        self.privileged = False
+        self.publish = []
+        self.publish_all = False
+        self.read_only = False
+        self.security_opts = []
+        self.tmpfs_mounts = []
+        self.user = None
+        self.volumes = []
+        self.volumes_from = None
+        self.working_directory = None
 
     def __repr__(self):
         return "<{} name:'{}' image:{}>".format(__class__.__name__, self.name, self.image)
