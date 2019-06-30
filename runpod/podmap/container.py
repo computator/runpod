@@ -9,8 +9,8 @@ class Container(object):
             raise TypeError("image: expected {} but got {}".format(ImageBase.__name__, type(image).__name__))
         self.image = image
         if name is not None:
-            if not isinstance(tag, six.text_type):
-                raise TypeError("tag: expected {} but got {}".format(six.text_type.__name__, type(tag).__name__))
+            if not isinstance(name, six.text_type):
+                raise TypeError("name: expected {} but got {}".format(six.text_type.__name__, type(name).__name__))
             self.name = name
         else:
             match = re.match('(?:.*/)?([^/:]*)(?::.*)?', image.id)
