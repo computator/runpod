@@ -51,4 +51,4 @@ class Container(object):
         self.working_directory = None
 
     def __repr__(self):
-        return "<{} name:'{}' image:{}>".format(__class__.__name__, self.name, self.image)
+        return "<{} name:'{}' image:{}>".format(type(self).__name__, self.name, self.image)

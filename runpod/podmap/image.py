@@ -11,7 +11,7 @@ class ImageBase(object):
         pass
 
     def __repr__(self):
-        return '<{}>'.format(__class__.__name__)
+        return '<{}>'.format(type(self).__name__)
 
     @abc.abstractproperty
     def id(self):
@@ -24,7 +24,7 @@ class DockerfileImage(ImageBase):
         self.source = dockerfile
 
     def __repr__(self):
-        return "<{} source:'{}'>".format(__class__.__name__, self.source)
+        return "<{} source:'{}'>".format(type(self).__name__, self.source)
 
     @property
     def id(self):
@@ -47,7 +47,7 @@ class NamedImage(ImageBase):
         self.tag = tag
 
     def __repr__(self):
-        return "<{} ref:'{}:{}''>".format(__class__.__name__, self.image, self.tag)
+        return "<{} ref:'{}:{}'>".format(type(self).__name__, self.image, self.tag)
 
     @property
     def id(self):
