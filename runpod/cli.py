@@ -72,7 +72,10 @@ class Cli(object):
                 six.raise_from(RuntimeError, sys.exc_info()[1])
         else:
             for cmdname in mod_cmdnames:
-                self.subparsers.add_parser(cmdname)
+                helptxt = None
+                if hasattr(mod, 'CMD_HELP') and cmdname in mod.CMD_HELP:
+                    helptxt = mod.CMD_HELP[cmdname]
+                self.subparsers.add_parser(cmdname, help=helptxt)
 
         self.cmds.update((cmdname, (mod, getattr(mod, 'cmd_' + cmdname))) for cmdname in mod_cmdnames)
 
