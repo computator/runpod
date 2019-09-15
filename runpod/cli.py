@@ -27,7 +27,7 @@ class Cli(object):
             raise argparse.ArgumentTypeError("'{}' is not a valid directory".format(directory))
 
         self.parser.add_argument("-F", "--source-format", choices=set(modname for _, modname, _ in pkgutil.iter_modules(runpod.parsers.__path__)), default="runpod", metavar="FMT", help="set the pod source format to %(metavar)s\n\t(default: %(default)s, formats: %(choices)s)")
-        self.parser.add_argument("-f", "--file", type=argparse.FileType(), default="runpod.yaml", help="specify the pod source file")
+        self.parser.add_argument("-f", "--file", help="specify the pod source file")
         self.parser.add_argument("-p", "--project-name", metavar="NAME", help="set the unique name used for the project\n\t(default: the name of the project working directory)")
         self.parser.add_argument("--project-directory", type=dir_validator, metavar="PATH", help="set the working directory for the project\n\t(default: the directory containing the pod source file)")
 
@@ -88,6 +88,13 @@ class Cli(object):
 
     def _process_args(self, args=None):
         self.opts = self.parser.parse_args(args)
+
+        if self.opts.file is None:
+            self.opts.file = importlib.import_module('runpod.parsers.{}'.format(self.opts.source_format)).DEFAULT_FILENAME
+        try:
+            self.opts.file = argparse.FileType()(self.opts.file)
+        except argparse.ArgumentTypeError as e:
+            self.parser.error(e)
 
         if self.opts.project_directory is None:
             if os.path.isfile(self.opts.file.name):

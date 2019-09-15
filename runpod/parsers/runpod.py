@@ -4,6 +4,8 @@ import yaml
 
 from runpod.parsers import ParseError
 
+DEFAULT_FILENAME = 'runpod.yaml'
+
 def parse_file(src_file):
     try:
         data = yaml.safe_load(src_file)
